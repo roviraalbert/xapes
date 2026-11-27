@@ -208,10 +208,17 @@ function pintar(){
     </div>`).join("");
 }
 
+function renderCercle(imatgeUrl, codi){
+  if (imatgeUrl) {
+    return `<img src="${imatgeUrl}" alt="${codi}" onerror="this.remove();this.parentNode.textContent='${codi}'">`;
+  }
+  return codi;
+}
+
 function fitxaXapa(x){
   return `
     <div class="xapa" onclick="location.hash='xapa-${x.id}'">
-      <div class="cercle">${x.codi}</div>
+      <div class="cercle">${renderCercle(x.imatge_url, x.codi)}</div>
       <div class="codi">${x.codi}${x.num_variant>1?" ·v"+x.num_variant:""}</div>
       ${usuariActual ? `
       <div class="estats" onclick="event.stopPropagation()">
@@ -250,14 +257,13 @@ async function mostrarFitxaXapa(id){
   main.innerHTML = '<p class="buit">Carregant fitxa...</p>';
   const { data: x, error } = await sb.from("v_cataleg_usuari").select("*").eq("id", id).maybeSingle();
   if (error || !x){ main.innerHTML = '<p class="buit">No s\'ha trobat la xapa.</p>'; return; }
-  const { data: imatges } = await sb.from("xapa_imatges").select("*").eq("xapa_id", id).order("ordre");
   const { data: posseidors } = await sb.from("v_posseidors_xapa").select("*").eq("xapa_id", id);
 
   main.innerHTML = `
     <div class="detall">
       <button class="chip" onclick="history.back()">&larr; Tornar</button>
       <div class="fila">
-        <div class="fitxa-img">${imatges?.[0] ? `<img src="${imatges[0].url}">` : ""}</div>
+        <div class="fitxa-img">${x.imatge_url ? `<img src="${x.imatge_url}" alt="${x.codi}" onerror="this.remove()">` : ""}</div>
         <div style="flex:1;min-width:220px">
           <h2>${x.codi}${x.nom_edicio ? " — " + x.nom_edicio : ""}</h2>
           <dl class="camps">
@@ -333,7 +339,7 @@ async function mostrarPerfil(usuariId){
       <div class="grid">
         ${(coleccio||[]).map(x => `
           <div class="xapa" onclick="location.hash='xapa-${x.xapa_id}'">
-            <div class="cercle">${x.codi}</div>
+            <div class="cercle">${renderCercle(x.imatge_url, x.codi)}</div>
             <div class="codi">${x.marca || ""}</div>
           </div>`).join("") || '<p class="buit">Aquest usuari no té cap xapa pública.</p>'}
       </div>
