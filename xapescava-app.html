@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xapes de Cava - La meva col·lecció</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#f7f3ee;--card:#fff;--text:#2b2b2b;--muted:#6b6b6b;--accent:#8a1538;--border:#e2dcd3;
+  --tinc:#4caf50;--rep:#2196f3;--busco:#ff9800;--no:#9e9e9e}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1a18;--card:#2a2725;--text:#eee;--muted:#aaa;--border:#3a362f}}
+:root[data-theme="dark"]{--bg:#1c1a18;--card:#2a2725;--text:#eee;--muted:#aaa;--border:#3a362f}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+header{background:var(--accent);color:#fff;padding:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+header h1{margin:0;font-size:1.2rem}
+#auth-box{max-width:360px;margin:3rem auto;background:var(--card);padding:1.5rem;border-radius:10px;border:1px solid var(--border)}
+#auth-box input{width:100%;padding:.6rem;margin:.4rem 0;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+#auth-box button{width:100%;padding:.6rem;margin-top:.5rem;border:none;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer}
+#msg{color:var(--accent);font-size:.9rem;min-height:1.2em}
+#resum{display:flex;gap:1rem;padding:.8rem 1rem;flex-wrap:wrap;font-size:.9rem}
+#resum span{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.3rem .7rem}
+#filtres{padding:0 1rem 1rem;display:flex;gap:.5rem;flex-wrap:wrap}
+#filtres button{padding:.4rem .9rem;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer}
+#filtres button.actiu{background:var(--accent);color:#fff;border-color:var(--accent)}
+main{padding:0 1rem 2rem}
+.grup h2{border-bottom:2px solid var(--border);padding-bottom:.3rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1rem}
+.xapa{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.6rem;text-align:center}
+.xapa img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:50%;background:var(--bg)}
+.xapa .codi{font-size:.75rem;color:var(--muted);margin:.3rem 0}
+.estats{display:flex;justify-content:center;gap:.25rem}
+.estats button{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);cursor:pointer;opacity:.35}
+.estats button.on{opacity:1}
+.b-tinc{background:var(--tinc)}.b-rep{background:var(--rep)}.b-busco{background:var(--busco)}.b-no{background:var(--no)}
+#logout{background:none;border:1px solid #fff;color:#fff;padding:.3rem .8rem;border-radius:6px;cursor:pointer}
+.buit{color:var(--muted);padding:2rem;text-align:center}
+</style>
+</head>
+<body>
+
+<div id="auth-box">
+  <h2>Xapes de Cava</h2>
+  <p id="msg"></p>
+  <input id="email" type="email" placeholder="Correu electrònic">
+  <input id="pass" type="password" placeholder="Contrasenya">
+  <button onclick="entrar()">Entrar</button>
+  <button onclick="registrar()" style="background:transparent;color:var(--accent);border:1px solid var(--accent)">Crear compte</button>
+</div>
+
+<div id="app" style="display:none">
+  <header>
+    <h1>🍾 Xapes de Cava</h1>
+    <button id="logout" onclick="sortir()">Tancar sessió</button>
+  </header>
+  <div id="resum"></div>
+  <div id="filtres">
+    <button class="actiu" data-f="totes" onclick="filtrar('totes')">Totes</button>
+    <button data-f="tinc" onclick="filtrar('tinc')">La meva col·lecció</button>
+    <button data-f="repetida" onclick="filtrar('repetida')">Repetides</button>
+    <button data-f="busco" onclick="filtrar('busco')">Busco</button>
+  </div>
+  <main id="main"><p class="buit">Carregant catàleg...</p></main>
+</div>
+
+<script>
+const SUPABASE_URL = "https://kvbeopgynanymlmugrvb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_xlyA52KpOJKIXEU5wO4hww_BUtkSCEO";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let dades = [];
+let filtreActual = "totes";
+
+function msg(t){ document.getElementById("msg").textContent = t; }
+
+async function registrar(){
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("pass").value;
+  const { error } = await sb.auth.signUp({ email, password: pass });
+  msg(error ? error.message : "Compte creat. Revisa el correu si cal confirmar-lo, després entra.");
+}
+
+async function entrar(){
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("pass").value;
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { msg(error.message); return; }
+  mostrarApp();
+}
+
+async function sortir(){
+  await sb.auth.signOut();
+  document.getElementById("app").style.display = "none";
+  document.getElementById("auth-box").style.display = "block";
+}
+
+async function mostrarApp(){
+  document.getElementById("auth-box").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  await carregarCataleg();
+  await carregarResum();
+}
+
+async function carregarResum(){
+  const { data, error } = await sb.from("v_resum_usuari").select("*").maybeSingle();
+  const r = document.getElementById("resum");
+  if (error || !data){ r.innerHTML = "<span>Tinc: 0</span><span>Repetides: 0</span><span>Busco: 0</span>"; return; }
+  r.innerHTML = `<span>Tinc: ${data.total_tinc||0}</span><span>Repetides: ${data.total_repetides||0}</span><span>Busco: ${data.total_busco||0}</span>`;
+}
+
+async function carregarCataleg(){
+  const { data, error } = await sb.from("v_catalegz_amb_estat").select("*").order("marca");
+  if (error){ document.getElementById("main").innerHTML = `<p class="buit">Error carregant: ${error.message}</p>`; return; }
+  dades = data || [];
+  pintar();
+}
+
+function pintar(){
+  const main = document.getElementById("main");
+  let llista = dades;
+  if (filtreActual !== "totes") llista = dades.filter(x => x.estat === filtreActual);
+  if (!llista.length){ main.innerHTML = '<p class="buit">No hi ha xapes per mostrar.</p>'; return; }
+
+  const grups = {};
+  llista.forEach(x => {
+    const clau = x.marca || "Sense marca";
+    (grups[clau] ||= []).push(x);
+  });
+
+  main.innerHTML = Object.keys(grups).sort().map(marca => `
+    <div class="grup">
+      <h2>${marca}</h2>
+      <div class="grid">
+        ${grups[marca].map(x => fitxaXapa(x)).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
+function fitxaXapa(x){
+  const img = x.imatge_url || "";
+  return `
+    <div class="xapa">
+      ${img ? `<img src="${img}" alt="${x.codi}">` : `<div class="xapa" style="aspect-ratio:1;border-radius:50%;background:var(--border)"></div>`}
+      <div class="codi">${x.codi}</div>
+      <div class="estats">
+        <button class="b-tinc ${x.estat==='tinc'?'on':''}" title="Tinc" onclick="marcar(${x.id},'tinc')"></button>
+        <button class="b-rep ${x.estat==='repetida'?'on':''}" title="Repetida" onclick="marcar(${x.id},'repetida')"></button>
+        <button class="b-busco ${x.estat==='busco'?'on':''}" title="Busco" onclick="marcar(${x.id},'busco')"></button>
+        <button class="b-no ${x.estat==='no_interessa'?'on':''}" title="No interessa" onclick="marcar(${x.id},'no_interessa')"></button>
+      </div>
+    </div>`;
+}
+
+async function marcar(xapaId, estat){
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  const xapa = dades.find(x => x.id === xapaId);
+  const nouEstat = xapa.estat === estat ? null : estat;
+
+  if (nouEstat === null){
+    await sb.from("usuari_xapes").delete().eq("usuari_id", user.id).eq("xapa_id", xapaId);
+  } else {
+    await sb.from("usuari_xapes").upsert(
+      { usuari_id: user.id, xapa_id: xapaId, estat: nouEstat },
+      { onConflict: "usuari_id,xapa_id" }
+    );
+  }
+  xapa.estat = nouEstat;
+  pintar();
+  carregarResum();
+}
+
+function filtrar(f){
+  filtreActual = f;
+  document.querySelectorAll("#filtres button").forEach(b => b.classList.toggle("actiu", b.dataset.f === f));
+  pintar();
+}
+
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session) mostrarApp();
+});
+</script>
+</body>
+</html>
