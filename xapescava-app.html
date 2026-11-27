@@ -2,39 +2,60 @@
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Xapes de Cava - La meva col·lecció</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Xapes de Cava</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{--bg:#f7f3ee;--card:#fff;--text:#2b2b2b;--muted:#6b6b6b;--accent:#8a1538;--border:#e2dcd3;
-  --tinc:#4caf50;--rep:#2196f3;--busco:#ff9800;--no:#9e9e9e}
+  --tinc:#4caf50;--rep:#2196f3;--busco:#ff9800;--no:#9e9e9e;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1a18;--card:#2a2725;--text:#eee;--muted:#aaa;--border:#3a362f}}
 :root[data-theme="dark"]{--bg:#1c1a18;--card:#2a2725;--text:#eee;--muted:#aaa;--border:#3a362f}
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
-header{background:var(--accent);color:#fff;padding:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
-header h1{margin:0;font-size:1.2rem}
+html{scroll-padding-top:var(--sat)}
+body{margin:0;padding-top:var(--sat);padding-bottom:var(--sab);font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+a{color:var(--accent)}
+header{position:sticky;top:0;z-index:5;background:var(--accent);color:#fff;padding:.8rem 1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+header h1{margin:0;font-size:1.15rem;cursor:pointer}
+nav button{background:none;border:1px solid rgba(255,255,255,.5);color:#fff;padding:.3rem .8rem;border-radius:16px;cursor:pointer;margin-left:.3rem}
+nav button.actiu{background:#fff;color:var(--accent)}
 #auth-box{max-width:360px;margin:3rem auto;background:var(--card);padding:1.5rem;border-radius:10px;border:1px solid var(--border)}
 #auth-box input{width:100%;padding:.6rem;margin:.4rem 0;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
 #auth-box button{width:100%;padding:.6rem;margin-top:.5rem;border:none;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer}
 #msg{color:var(--accent);font-size:.9rem;min-height:1.2em}
-#resum{display:flex;gap:1rem;padding:.8rem 1rem;flex-wrap:wrap;font-size:.9rem}
+.barra{padding:.8rem 1rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.barra input, .barra select{padding:.45rem .6rem;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+#cerca{flex:1;min-width:180px}
+#resum{display:flex;gap:1rem;padding:0 1rem .8rem;flex-wrap:wrap;font-size:.85rem}
 #resum span{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.3rem .7rem}
-#filtres{padding:0 1rem 1rem;display:flex;gap:.5rem;flex-wrap:wrap}
-#filtres button{padding:.4rem .9rem;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer}
-#filtres button.actiu{background:var(--accent);color:#fff;border-color:var(--accent)}
-main{padding:0 1rem 2rem}
-.grup h2{border-bottom:2px solid var(--border);padding-bottom:.3rem}
+main{padding:0 1rem 2rem;max-width:1100px;margin:0 auto}
+.grup h2{border-bottom:2px solid var(--border);padding-bottom:.3rem;font-size:1.05rem}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1rem}
-.xapa{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.6rem;text-align:center}
-.xapa img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:50%;background:var(--bg)}
+.xapa{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.6rem;text-align:center;cursor:pointer}
+.xapa .cercle{width:100%;aspect-ratio:1;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:.7rem;color:var(--muted)}
+.xapa .cercle img{width:100%;height:100%;object-fit:cover}
 .xapa .codi{font-size:.75rem;color:var(--muted);margin:.3rem 0}
 .estats{display:flex;justify-content:center;gap:.25rem}
 .estats button{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);cursor:pointer;opacity:.35}
 .estats button.on{opacity:1}
 .b-tinc{background:var(--tinc)}.b-rep{background:var(--rep)}.b-busco{background:var(--busco)}.b-no{background:var(--no)}
-#logout{background:none;border:1px solid #fff;color:#fff;padding:.3rem .8rem;border-radius:6px;cursor:pointer}
 .buit{color:var(--muted);padding:2rem;text-align:center}
+.detall{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.2rem;margin-top:1rem}
+.detall h2{margin-top:0}
+.fila{display:flex;gap:2rem;flex-wrap:wrap}
+.fitxa-img{width:160px;aspect-ratio:1;border-radius:50%;background:var(--border);overflow:hidden}
+.fitxa-img img{width:100%;height:100%;object-fit:cover}
+.camps dt{color:var(--muted);font-size:.8rem;margin-top:.5rem}
+.camps dd{margin:0;font-size:.95rem}
+.posseidors{list-style:none;padding:0}
+.posseidors li{padding:.4rem 0;border-bottom:1px solid var(--border)}
+.unitats-ctrl{display:flex;align-items:center;gap:.5rem;margin:.6rem 0}
+.unitats-ctrl button{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:1.1rem}
+.chip{padding:.3rem .8rem;border-radius:16px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer}
+.chip.on{background:var(--busco);color:#fff;border-color:var(--busco)}
+.chip.off-on{background:var(--no);color:#fff;border-color:var(--no)}
+#sortir{background:none;border:1px solid #fff;color:#fff;padding:.3rem .8rem;border-radius:6px;cursor:pointer}
+textarea{width:100%;padding:.5rem;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit}
 </style>
 </head>
 <body>
@@ -46,21 +67,34 @@ main{padding:0 1rem 2rem}
   <input id="pass" type="password" placeholder="Contrasenya">
   <button onclick="entrar()">Entrar</button>
   <button onclick="registrar()" style="background:transparent;color:var(--accent);border:1px solid var(--accent)">Crear compte</button>
+  <p style="font-size:.8rem;color:var(--muted)">També pots <a href="#cataleg" onclick="mostrarApp(false)">explorar el catàleg sense sessió</a>.</p>
 </div>
 
 <div id="app" style="display:none">
   <header>
-    <h1>🍾 Xapes de Cava</h1>
-    <button id="logout" onclick="sortir()">Tancar sessió</button>
+    <h1 onclick="navega('cataleg')">🍾 Xapes de Cava</h1>
+    <nav>
+      <button data-v="cataleg" onclick="navega('cataleg')">Catàleg global</button>
+      <button data-v="meu" onclick="navega('meu')">El meu catàleg</button>
+      <button id="sortir" onclick="sortir()" style="display:none">Tancar sessió</button>
+      <button id="entrar-nav" onclick="location.hash=''" style="display:none">Entrar</button>
+    </nav>
   </header>
-  <div id="resum"></div>
-  <div id="filtres">
-    <button class="actiu" data-f="totes" onclick="filtrar('totes')">Totes</button>
-    <button data-f="tinc" onclick="filtrar('tinc')">La meva col·lecció</button>
-    <button data-f="repetida" onclick="filtrar('repetida')">Repetides</button>
-    <button data-f="busco" onclick="filtrar('busco')">Busco</button>
+  <div class="barra">
+    <input id="cerca" placeholder="Cerca per codi, marca o edició..." oninput="pintar()">
+    <select id="filtre-categoria" onchange="pintar()"><option value="">Totes les categories</option></select>
+    <select id="filtre-marca" onchange="pintar()"><option value="">Totes les marques</option></select>
+    <select id="filtre-estat" onchange="pintar()" style="display:none">
+      <option value="">Qualsevol estat</option>
+      <option value="tinc">Tinc</option>
+      <option value="repetida">Repetides</option>
+      <option value="busco">Busco</option>
+    </select>
+    <input id="cerca-usuari" placeholder="Cerca un usuari..." oninput="cercarUsuaris()" style="max-width:160px">
+    <div id="resultats-usuari" style="position:relative"></div>
   </div>
-  <main id="main"><p class="buit">Carregant catàleg...</p></main>
+  <div id="resum"></div>
+  <main id="main"><p class="buit">Carregant...</p></main>
 </div>
 
 <script>
@@ -69,7 +103,7 @@ const SUPABASE_KEY = "sb_publishable_xlyA52KpOJKIXEU5wO4hww_BUtkSCEO";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let dades = [];
-let filtreActual = "totes";
+let usuariActual = null;
 
 function msg(t){ document.getElementById("msg").textContent = t; }
 
@@ -85,101 +119,239 @@ async function entrar(){
   const pass = document.getElementById("pass").value;
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
   if (error) { msg(error.message); return; }
-  mostrarApp();
+  mostrarApp(true);
 }
 
 async function sortir(){
   await sb.auth.signOut();
-  document.getElementById("app").style.display = "none";
-  document.getElementById("auth-box").style.display = "block";
+  usuariActual = null;
+  location.hash = "";
+  mostrarApp(false);
 }
 
-async function mostrarApp(){
+async function mostrarApp(logat){
+  const { data: { user } } = await sb.auth.getUser();
+  usuariActual = user || null;
   document.getElementById("auth-box").style.display = "none";
   document.getElementById("app").style.display = "block";
-  await carregarCataleg();
-  await carregarResum();
+  document.getElementById("sortir").style.display = usuariActual ? "inline-block" : "none";
+  document.getElementById("entrar-nav").style.display = usuariActual ? "none" : "inline-block";
+  await carregarFiltres();
+  if (!location.hash) location.hash = "cataleg";
+  enrutar();
 }
+
+async function carregarFiltres(){
+  const { data: cats } = await sb.from("categories").select("nom").order("ordre");
+  const selCat = document.getElementById("filtre-categoria");
+  (cats||[]).forEach(c => selCat.insertAdjacentHTML("beforeend", `<option value="${c.nom}">${c.nom}</option>`));
+  const { data: marques } = await sb.from("marques").select("nom").order("nom");
+  const selMarca = document.getElementById("filtre-marca");
+  const noms = [...new Set((marques||[]).map(m=>m.nom))];
+  noms.forEach(n => selMarca.insertAdjacentHTML("beforeend", `<option value="${n}">${n}</option>`));
+}
+
+window.addEventListener("hashchange", enrutar);
+
+function enrutar(){
+  const h = location.hash.replace("#","") || "cataleg";
+  document.querySelectorAll("nav button[data-v]").forEach(b => b.classList.toggle("actiu", b.dataset.v === h));
+  document.getElementById("filtre-estat").style.display = h === "meu" ? "inline-block" : "none";
+  if (h.startsWith("xapa-")) return mostrarFitxaXapa(h.replace("xapa-",""));
+  if (h.startsWith("usuari-")) return mostrarPerfil(h.replace("usuari-",""));
+  carregarCataleg(h === "meu");
+}
+
+function navega(v){ location.hash = v; }
 
 async function carregarResum(){
-  const { data, error } = await sb.from("v_resum_usuari").select("*").maybeSingle();
+  if (!usuariActual){ document.getElementById("resum").innerHTML = ""; return; }
+  const { data } = await sb.from("v_resum_usuari").select("*").maybeSingle();
   const r = document.getElementById("resum");
-  if (error || !data){ r.innerHTML = "<span>Tinc: 0</span><span>Repetides: 0</span><span>Busco: 0</span>"; return; }
-  r.innerHTML = `<span>Tinc: ${data.total_tinc||0}</span><span>Repetides: ${data.total_repetides||0}</span><span>Busco: ${data.total_busco||0}</span>`;
+  r.innerHTML = `<span>Tinc: ${data?.total_tinc||0}</span><span>Repetides: ${data?.total_repetides||0}</span><span>Busco: ${data?.total_busco||0}</span>`;
 }
 
-async function carregarCataleg(){
-  const { data, error } = await sb.from("v_catalegz_amb_estat").select("*").order("marca");
+async function carregarCataleg(nomesMeu){
+  document.getElementById("main").innerHTML = '<p class="buit">Carregant...</p>';
+  let q = sb.from("v_cataleg_usuari").select("*").order("marca");
+  if (nomesMeu) q = q.not("estat", "is", null);
+  const { data, error } = await q;
   if (error){ document.getElementById("main").innerHTML = `<p class="buit">Error carregant: ${error.message}</p>`; return; }
   dades = data || [];
+  carregarResum();
   pintar();
 }
 
 function pintar(){
   const main = document.getElementById("main");
-  let llista = dades;
-  if (filtreActual !== "totes") llista = dades.filter(x => x.estat === filtreActual);
+  const terme = document.getElementById("cerca").value.toLowerCase();
+  const cat = document.getElementById("filtre-categoria").value;
+  const marca = document.getElementById("filtre-marca").value;
+  const estat = document.getElementById("filtre-estat").value;
+
+  let llista = dades.filter(x =>
+    (!terme || `${x.codi} ${x.marca} ${x.nom_edicio||""}`.toLowerCase().includes(terme)) &&
+    (!cat || x.categoria === cat) &&
+    (!marca || x.marca === marca) &&
+    (!estat || x.estat === estat)
+  );
+
   if (!llista.length){ main.innerHTML = '<p class="buit">No hi ha xapes per mostrar.</p>'; return; }
 
   const grups = {};
-  llista.forEach(x => {
-    const clau = x.marca || "Sense marca";
-    (grups[clau] ||= []).push(x);
-  });
+  llista.forEach(x => (grups[x.marca || "Sense marca"] ||= []).push(x));
 
-  main.innerHTML = Object.keys(grups).sort().map(marca => `
+  main.innerHTML = Object.keys(grups).sort().map(m => `
     <div class="grup">
-      <h2>${marca}</h2>
-      <div class="grid">
-        ${grups[marca].map(x => fitxaXapa(x)).join("")}
-      </div>
-    </div>
-  `).join("");
+      <h2>${m}</h2>
+      <div class="grid">${grups[m].map(fitxaXapa).join("")}</div>
+    </div>`).join("");
 }
 
 function fitxaXapa(x){
-  const img = x.imatge_url || "";
   return `
-    <div class="xapa">
-      ${img ? `<img src="${img}" alt="${x.codi}">` : `<div class="xapa" style="aspect-ratio:1;border-radius:50%;background:var(--border)"></div>`}
-      <div class="codi">${x.codi}</div>
-      <div class="estats">
-        <button class="b-tinc ${x.estat==='tinc'?'on':''}" title="Tinc" onclick="marcar(${x.id},'tinc')"></button>
-        <button class="b-rep ${x.estat==='repetida'?'on':''}" title="Repetida" onclick="marcar(${x.id},'repetida')"></button>
-        <button class="b-busco ${x.estat==='busco'?'on':''}" title="Busco" onclick="marcar(${x.id},'busco')"></button>
-        <button class="b-no ${x.estat==='no_interessa'?'on':''}" title="No interessa" onclick="marcar(${x.id},'no_interessa')"></button>
+    <div class="xapa" onclick="location.hash='xapa-${x.id}'">
+      <div class="cercle">${x.codi}</div>
+      <div class="codi">${x.codi}${x.num_variant>1?" ·v"+x.num_variant:""}</div>
+      ${usuariActual ? `
+      <div class="estats" onclick="event.stopPropagation()">
+        <button class="b-tinc ${x.estat==='tinc'?'on':''}" title="Tinc" onclick="marcarUnitats(${x.id}, x=>x.estat==='tinc'?0:1)"></button>
+        <button class="b-rep ${x.estat==='repetida'?'on':''}" title="Repetida" onclick="marcarUnitats(${x.id}, x=>x.estat==='repetida'?1:2)"></button>
+        <button class="b-busco ${x.estat==='busco'?'on':''}" title="Busco" onclick="marcarInteres(${x.id},'busco')"></button>
+        <button class="b-no ${x.estat==='no_interessa'?'on':''}" title="No interessa" onclick="marcarInteres(${x.id},'no_interessa')"></button>
+      </div>` : ""}
+    </div>`;
+}
+
+async function marcarUnitats(xapaId, calc){
+  if (!usuariActual) return;
+  const x = dades.find(d => d.id === xapaId);
+  const unitats = calc(x);
+  await sb.from("usuari_xapes").upsert(
+    { usuari_id: usuariActual.id, xapa_id: xapaId, unitats, interes: null },
+    { onConflict: "usuari_id,xapa_id" }
+  );
+  await carregarCataleg(location.hash.replace("#","") === "meu");
+}
+
+async function marcarInteres(xapaId, interes){
+  if (!usuariActual) return;
+  const x = dades.find(d => d.id === xapaId);
+  const nou = x.estat === interes ? null : interes;
+  await sb.from("usuari_xapes").upsert(
+    { usuari_id: usuariActual.id, xapa_id: xapaId, unitats: 0, interes: nou },
+    { onConflict: "usuari_id,xapa_id" }
+  );
+  await carregarCataleg(location.hash.replace("#","") === "meu");
+}
+
+async function mostrarFitxaXapa(id){
+  const main = document.getElementById("main");
+  main.innerHTML = '<p class="buit">Carregant fitxa...</p>';
+  const { data: x, error } = await sb.from("v_cataleg_usuari").select("*").eq("id", id).maybeSingle();
+  if (error || !x){ main.innerHTML = '<p class="buit">No s\'ha trobat la xapa.</p>'; return; }
+  const { data: imatges } = await sb.from("xapa_imatges").select("*").eq("xapa_id", id).order("ordre");
+  const { data: posseidors } = await sb.from("v_posseidors_xapa").select("*").eq("xapa_id", id);
+
+  main.innerHTML = `
+    <div class="detall">
+      <button class="chip" onclick="history.back()">&larr; Tornar</button>
+      <div class="fila">
+        <div class="fitxa-img">${imatges?.[0] ? `<img src="${imatges[0].url}">` : ""}</div>
+        <div style="flex:1;min-width:220px">
+          <h2>${x.codi}${x.nom_edicio ? " — " + x.nom_edicio : ""}</h2>
+          <dl class="camps">
+            <dt>Marca</dt><dd>${x.marca || "—"}</dd>
+            <dt>Categoria</dt><dd>${x.categoria || "—"}</dd>
+            <dt>Any d'expedició</dt><dd>${x.any_expedicio || "—"}</dd>
+            <dt>País d'origen</dt><dd>${x.pais_origen || "—"}</dd>
+            <dt>Descripció</dt><dd>${x.descripcio || "—"}</dd>
+            ${x.url_externa ? `<dt>Enllaç extern</dt><dd><a href="${x.url_externa}" target="_blank" rel="noopener">${x.url_externa}</a></dd>` : ""}
+          </dl>
+        </div>
+      </div>
+
+      ${usuariActual ? `
+      <h3>La meva informació</h3>
+      <div class="unitats-ctrl">
+        <button onclick="canviUnitats(${x.id}, -1)">−</button>
+        <span>Unitats: <strong id="num-unitats">${x.unitats||0}</strong></span>
+        <button onclick="canviUnitats(${x.id}, 1)">+</button>
+      </div>
+      <div>
+        <span class="chip ${x.interes==='busco'?'on':''}" onclick="marcarInteresFitxa(${x.id},'busco')">La busco</span>
+        <span class="chip ${x.interes==='no_interessa'?'off-on':''}" onclick="marcarInteresFitxa(${x.id},'no_interessa')">No m'interessa</span>
+      </div>
+      <textarea id="comentaris-personal" rows="2" placeholder="Comentaris personals...">${x.usuari_comentaris||""}</textarea>
+      <button class="chip" onclick="desarComentari(${x.id})">Desar comentari</button>
+      ` : `<p class="buit">Inicia sessió per marcar aquesta xapa a la teva col·lecció.</p>`}
+
+      <h3>Usuaris que la tenen</h3>
+      <ul class="posseidors">
+        ${(posseidors||[]).length ? posseidors.map(p => `<li><a href="#usuari-${p.usuari_id}">${p.nom_usuari || "usuari"}</a> — ${p.unitats} unitat(s)</li>`).join("") : '<li class="buit">Ningú més l\'ha marcada com a pública encara.</li>'}
+      </ul>
+    </div>`;
+}
+
+async function canviUnitats(xapaId, delta){
+  const actuals = parseInt(document.getElementById("num-unitats").textContent) || 0;
+  const noves = Math.max(0, actuals + delta);
+  await sb.from("usuari_xapes").upsert(
+    { usuari_id: usuariActual.id, xapa_id: xapaId, unitats: noves, interes: noves > 0 ? null : undefined },
+    { onConflict: "usuari_id,xapa_id" }
+  );
+  mostrarFitxaXapa(xapaId);
+}
+
+async function marcarInteresFitxa(xapaId, interes){
+  await sb.from("usuari_xapes").upsert(
+    { usuari_id: usuariActual.id, xapa_id: xapaId, unitats: 0, interes },
+    { onConflict: "usuari_id,xapa_id" }
+  );
+  mostrarFitxaXapa(xapaId);
+}
+
+async function desarComentari(xapaId){
+  const text = document.getElementById("comentaris-personal").value;
+  await sb.from("usuari_xapes").upsert(
+    { usuari_id: usuariActual.id, xapa_id: xapaId, comentaris: text },
+    { onConflict: "usuari_id,xapa_id" }
+  );
+}
+
+async function mostrarPerfil(usuariId){
+  const main = document.getElementById("main");
+  main.innerHTML = '<p class="buit">Carregant perfil...</p>';
+  const { data: perfil } = await sb.from("perfils").select("*").eq("id", usuariId).maybeSingle();
+  const { data: coleccio, error } = await sb.from("v_cataleg_de_usuari").select("*").eq("usuari_id", usuariId);
+  if (error){ main.innerHTML = `<p class="buit">Error: ${error.message}</p>`; return; }
+
+  main.innerHTML = `
+    <div class="detall">
+      <button class="chip" onclick="history.back()">&larr; Tornar</button>
+      <h2>Col·lecció de ${perfil?.nom_usuari || "usuari"}</h2>
+      <div class="grid">
+        ${(coleccio||[]).map(x => `
+          <div class="xapa" onclick="location.hash='xapa-${x.xapa_id}'">
+            <div class="cercle">${x.codi}</div>
+            <div class="codi">${x.marca || ""}</div>
+          </div>`).join("") || '<p class="buit">Aquest usuari no té cap xapa pública.</p>'}
       </div>
     </div>`;
 }
 
-async function marcar(xapaId, estat){
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return;
-  const xapa = dades.find(x => x.id === xapaId);
-  const nouEstat = xapa.estat === estat ? null : estat;
-
-  if (nouEstat === null){
-    await sb.from("usuari_xapes").delete().eq("usuari_id", user.id).eq("xapa_id", xapaId);
-  } else {
-    await sb.from("usuari_xapes").upsert(
-      { usuari_id: user.id, xapa_id: xapaId, estat: nouEstat },
-      { onConflict: "usuari_id,xapa_id" }
-    );
-  }
-  xapa.estat = nouEstat;
-  pintar();
-  carregarResum();
+async function cercarUsuaris(){
+  const terme = document.getElementById("cerca-usuari").value.trim();
+  const cont = document.getElementById("resultats-usuari");
+  if (terme.length < 2){ cont.innerHTML = ""; return; }
+  const { data } = await sb.from("perfils").select("id,nom_usuari").ilike("nom_usuari", `%${terme}%`).limit(8);
+  cont.innerHTML = (data||[]).length ? `
+    <div style="position:absolute;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.3rem;z-index:10">
+      ${data.map(p => `<div style="padding:.3rem .5rem;cursor:pointer" onclick="location.hash='usuari-${p.id}'">${p.nom_usuari}</div>`).join("")}
+    </div>` : "";
 }
 
-function filtrar(f){
-  filtreActual = f;
-  document.querySelectorAll("#filtres button").forEach(b => b.classList.toggle("actiu", b.dataset.f === f));
-  pintar();
-}
-
-sb.auth.getSession().then(({ data: { session } }) => {
-  if (session) mostrarApp();
-});
+sb.auth.getSession().then(({ data: { session } }) => mostrarApp(!!session));
 </script>
 </body>
 </html>
