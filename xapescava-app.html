@@ -77,7 +77,7 @@ textarea{width:100%;padding:.5rem;border-radius:6px;border:1px solid var(--borde
       <button data-v="cataleg" onclick="navega('cataleg')">Catàleg global</button>
       <button data-v="meu" onclick="navega('meu')">El meu catàleg</button>
       <button id="sortir" onclick="sortir()" style="display:none">Tancar sessió</button>
-      <button id="entrar-nav" onclick="location.hash=''" style="display:none">Entrar</button>
+      <button id="entrar-nav" onclick="mostrarLogin()" style="display:none">Entrar</button>
     </nav>
   </header>
   <div class="barra">
@@ -122,11 +122,18 @@ async function entrar(){
   mostrarApp(true);
 }
 
+function mostrarLogin(){
+  msg("");
+  document.getElementById("app").style.display = "none";
+  document.getElementById("auth-box").style.display = "block";
+  document.getElementById("email").focus();
+}
+
 async function sortir(){
   await sb.auth.signOut();
   usuariActual = null;
   location.hash = "";
-  mostrarApp(false);
+  mostrarLogin();
 }
 
 async function mostrarApp(logat){
@@ -256,7 +263,7 @@ async function mostrarFitxaXapa(id){
   const main = document.getElementById("main");
   main.innerHTML = '<p class="buit">Carregant fitxa...</p>';
   const { data: x, error } = await sb.from("v_cataleg_usuari").select("*").eq("id", id).maybeSingle();
-  if (error || !x){ main.innerHTML = '<p class="buit">No s\'ha trobat la xapa.</p>'; return; }
+  if (error || !x){ main.innerHTML = '<p class="buit">No s'ha trobat la xapa.</p>'; return; }
   const { data: posseidors } = await sb.from("v_posseidors_xapa").select("*").eq("xapa_id", id);
 
   main.innerHTML = `
@@ -294,7 +301,7 @@ async function mostrarFitxaXapa(id){
 
       <h3>Usuaris que la tenen</h3>
       <ul class="posseidors">
-        ${(posseidors||[]).length ? posseidors.map(p => `<li><a href="#usuari-${p.usuari_id}">${p.nom_usuari || "usuari"}</a> — ${p.unitats} unitat(s)</li>`).join("") : '<li class="buit">Ningú més l\'ha marcada com a pública encara.</li>'}
+        ${(posseidors||[]).length ? posseidors.map(p => `<li><a href="#usuari-${p.usuari_id}">${p.nom_usuari || "usuari"}</a> — ${p.unitats} unitat(s)</li>`).join("") : '<li class="buit">Ningú més l'ha marcada com a pública encara.</li>'}
       </ul>
     </div>`;
 }
